@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.p2p.bussiness.mapper.RechargeOfflineMapper">
+  <resultMap id="BaseResultMap" type="cn.wolfcode.p2p.bussiness.domain.RechargeOffline">
+    <id column="id" property="id" />
+    <result column="state" property="state" />
+    <result column="remark" property="remark" />
+    <result column="auditTime" property="auditTime" />
+    <result column="applyTime" property="applyTime" />
+    <result column="tradeCode" property="tradeCode" />
+    <result column="tradeTime" property="tradeTime" />
+    <result column="amount" property="amount" />
+    <result column="note" property="note" />
+    <association property="applier" columnPrefix="ap_" column="applierId" javaType="cn.wolfcode.p2p.base.domain.LoginInfo">
+      <id column="id" property="id"/>
+      <result column="username" property="username"/>
+    </association>
+    <association property="auditor" columnPrefix="au_" column="auditorId" javaType="cn.wolfcode.p2p.base.domain.LoginInfo">
+      <id column="id" property="id"/>
+      <result column="username" property="username"/>
+    </association>
+    <association property="bankInfo" column="bankInfoId" columnPrefix="bank_" javaType="cn.wolfcode.p2p.bussiness.domain.PlatformBankInfo">
+      <id column="id" property="id"/>
+      <result column="bankName" property="bankName"/>
+      <result column="accountName" property="accountName"/>
+      <result column="accountNumber" property="accountNumber"/>
+      <result column="bankForkName" property="bankForkName"/>
+    </association>
+  </resultMap>
+
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into rechargeoffline (state, remark, auditTime, applyTime, auditorId, applierId, 
+      tradeCode, tradeTime, amount, note, bankInfoId)
+    values (#{state}, #{remark}, #{auditTime}, #{applyTime}, #{auditor.id}, #{applier.id},
+      #{tradeCode}, #{tradeTime}, #{amount}, #{note}, #{bankInfo.id})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update rechargeoffline
+    set state = #{state},
+      remark = #{remark},
+      auditTime = #{auditTime},
+      applyTime = #{applyTime},
+      auditorId = #{auditor.id},
+      applierId = #{applier.id},
+      tradeCode = #{tradeCode},
+      tradeTime = #{tradeTime},
+      amount = #{amount},
+      note = #{note},
+      bankInfoId = #{bankInfo.id}
+    where id = #{id}
+  </update>
+  <sql id="base_select">
+    re.id, re.state, re.remark, re.auditTime, re.applyTime, re.auditorId,
+    re.applierId, re.tradeCode,re.tradeTime, re.amount, re.note, re.bankInfoId,
+    ap.id ap_id,ap.username ap_username,
+    au.id au_id,au.username au_username,
+    bank.id bank_id,bank.bankName bank_bankName,
+    bank.accountName bank_accountName,
+    bank.accountNumber bank_accountNumber,
+    bank.bankForkName bank_bankForkName
+  </sql>
+  <sql id="base_table">
+    rechargeoffline re
+    join logininfo ap on ap.id = re.applierId
+    left join logininfo au on au.id = re.auditorId
+    join platformbankinfo bank on bank.id = re.bankInfoId
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select <include refid="base_select"/>
+    from
+        <include refid="base_table"/>
+    where re.id = #{id}
+  </select>
+
+  <select id="queryForCount" resultType="int">
+    select count(0) from rechargeoffline re
+    <include refid="base_where"/>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    select <include refid="base_select"/>
+    from
+    <include refid="base_table"/>
+    <include refid="base_where"/>
+    limit #{start},#{pageSize}
+  </select>
+  
+  <sql id="base_where">
+    <where>
+      <if test="state != -1">
+        and re.state = #{state}
+      </if>
+      <if test="bankInfoId != -1">
+        and re.bankInfoId = #{bankInfoId}
+      </if>
+      <if test="beginDate != null">
+        and re.tradeTime &gt;= #{beginDate}
+      </if>
+      <if test="endDate != null">
+        and re.tradeTime &lt;= #{endDate}
+      </if>
+      <if test="tradeCode != null">
+        and re.tradeCode = #{tradeCode}
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

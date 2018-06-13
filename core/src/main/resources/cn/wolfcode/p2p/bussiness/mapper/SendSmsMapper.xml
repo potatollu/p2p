@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.p2p.bussiness.mapper.SendSmsMapper">
+  <resultMap id="BaseResultMap" type="cn.wolfcode.p2p.bussiness.domain.SendSms">
+    <id column="id" property="id" />
+    <result column="bidRequstSuccess" property="bidRequstSuccess" />
+    <result column="bidRequstFaile" property="bidRequstFaile" />
+    <result column="bidSuccess" property="bidSuccess" />
+    <result column="user_id" property="userId" />
+    <result column="state" property="state" />
+  </resultMap>
+
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into sendsms (bidRequstSuccess, bidRequstFaile, bidSuccess,user_id,state)
+    values (#{bidRequstSuccess}, #{bidRequstFaile}, #{bidSuccess},#{userId},#{state})
+  </insert>
+  <select id="selectByUserId" resultMap="BaseResultMap">
+    select id, bidRequstSuccess, bidRequstFaile, bidSuccess,user_id,state
+    from sendsms where user_id =#{userId}
+  </select>
+  <update id="updateState">
+    update sendsms set state = 0
+  </update>
+  <select id="countMesage" resultType="int">
+    select count(id) from sendsms where state=1
+  </select>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.wolfcode.p2p.base.mapper.LoginInfoMapper">
+    <resultMap id="baseResultMap" type="cn.wolfcode.p2p.base.domain.LoginInfo">
+        <id property="id" column="id" />
+        <result property="state" column="state" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="userType" column="userType" />
+    </resultMap>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        insert into logininfo(username,password,state,userType)
+        values(#{username},#{password},#{state},#{userType})
+    </insert>
+
+    <select id="existUsername" resultType="int">
+        select count(0) from logininfo where username=#{username}
+    </select>
+
+    <select id="selectById" resultMap="baseResultMap">
+        select id,username,password,state,userType from logininfo
+        where id = #{id}
+    </select>
+    <select id="login" resultType="cn.wolfcode.p2p.base.domain.LoginInfo">
+        select id,username,password,state,userType from logininfo
+         where username=#{username} and password = #{password}
+    </select>
+    <select id="listByUserType" resultMap="baseResultMap">
+        select id,username,password,state,userType from logininfo
+         where userType=#{userType}
+    </select>
+</mapper>
